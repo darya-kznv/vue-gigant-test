@@ -132,8 +132,6 @@ export default {
 				let hours = minutes / 60;
 				let days = hours / 24;
 
-				console.log(days);
-
 				let findDateIndex = this.dates.findIndex(d => d.id === val.id);
 				(days <= 0 || days > 0.5)
 					? this.dates[findDateIndex].corrected = false
