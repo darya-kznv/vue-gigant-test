@@ -6,6 +6,7 @@
 				mode="dateTime"
 				is-range
 				is24hr
+				:mask="masks"
 			>
 				<template #default="{togglePopover, inputValue, hidePopover}">
 					<div class="free-time__add-range">
@@ -35,9 +36,10 @@
 									</svg>
 									<input
 										class="textfield__control"
-										:value="$formatterDate.getDate24Time(itemDate.date.start)"
-										@focus="dateSelected($event, itemDate, togglePopover)"
 										ref="startDate"
+										v-model="itemDate.formattedDate.start"
+										@blur="changeSelectedDate(itemDate.formattedDate)"
+										@focus="dateSelected($event, itemDate, togglePopover)"
 									/>
 								</div>
 								<div class="textfield">
@@ -58,9 +60,9 @@
 									<input
 										class="textfield__control"
 										:class="{'textfield__control--error': !itemDate.corrected }"
-										:value="$formatterDate.getDate24Time(itemDate.date.end)"
 										ref="endDate"
-										@blur="checkEndDate(itemDate);"
+										v-model="itemDate.formattedDate.end"
+										@blur="changeSelectedDate(itemDate.formattedDate)"
 										@focus="dateSelected($event, itemDate, togglePopover)"
 									/>
 								</div>
@@ -113,18 +115,31 @@ export default {
 	data() {
 		return {
 			dates: [],
-			selected: {
-			},
+			selected: {},
 			masks: {
 				inputDateTime24hr: 'YYYY-MM-DD HH:mm',
 			},
 			isDateCorrected: true,
-			errorText: 'Вы не можете выбрать время больше 12 часов'
+			errorText: 'Вы не можете выбрать период больше 12 часов'
 		}
 	},
 	watch: {
-		selected: function () {
+		selected: {
+			handler(val) {
+				let diff = new Date(val.date.end).getTime() - new Date(val.date.start).getTime();
+				let seconds = diff / 1000;
+				let minutes = seconds / 60;
+				let hours = minutes / 60;
+				let days = hours / 24;
 
+				console.log(days);
+
+				let findDateIndex = this.dates.findIndex(d => d.id === val.id);
+				(days <= 0 || days > 0.5)
+					? this.dates[findDateIndex].corrected = false
+					: this.dates[findDateIndex].corrected = true
+			},
+			deep: true
 		}
 	},
 	methods: {
@@ -138,6 +153,10 @@ export default {
 			let addDate = {
 				id: id,
 				date: {
+					start: startFormattedDate,
+					end: endFormattedDate,
+				},
+				formattedDate: {
 					start: startFormattedDate,
 					end: endFormattedDate,
 				},
@@ -155,18 +174,10 @@ export default {
 			this.dates = this.dates.filter(itemDate => itemDate !== date);
 			hide();
 		},
-		checkEndDate(date) {
-			this.dates.map(function (itemDate) {
-				if (itemDate.id === date.id) {
-					let diff = new Date(itemDate.date.end).getTime() - new Date(itemDate.date.start).getTime();
-					let seconds = diff / 1000;
-					let minutes = seconds / 60;
-					let hours = minutes / 60;
-					let days = hours / 24;
-					itemDate.corrected = days <= 0.5;
-				}
-			});
-		},
+		changeSelectedDate(formattedDate) {
+			this.selected.date.start = new Date(formattedDate.start);
+			this.selected.date.end = new Date(formattedDate.end);
+		}
 	}
 }
 </script>
@@ -409,6 +420,15 @@ export default {
 	.free-time__btn-add {
 		width: 100%;
 	}
+
+	.textfield:nth-child(1) {
+		margin-right: 10px;
+	}
+
+	.textfield:nth-child(1)::before {
+		left: calc(100% + 2.5px);
+	}
+
 }
 
 </style>
