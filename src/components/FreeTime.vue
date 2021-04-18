@@ -37,6 +37,8 @@
 									<input
 										class="textfield__control"
 										ref="startDate"
+										type="text"
+										placeholder="YYYY-MM-DD HH:mm"
 										v-model="itemDate.formattedDate.start"
 										@blur="changeSelectedDate(itemDate.formattedDate)"
 										@focus="dateSelected($event, itemDate, togglePopover)"
@@ -61,6 +63,8 @@
 										class="textfield__control"
 										:class="{'textfield__control--error': !itemDate.corrected }"
 										ref="endDate"
+										placeholder="YYYY-MM-DD HH:mm"
+										type="text"
 										v-model="itemDate.formattedDate.end"
 										@blur="changeSelectedDate(itemDate.formattedDate)"
 										@focus="dateSelected($event, itemDate, togglePopover)"
@@ -120,7 +124,7 @@ export default {
 				inputDateTime24hr: 'YYYY-MM-DD HH:mm',
 			},
 			isDateCorrected: true,
-			errorText: 'Вы не можете выбрать период больше 12 часов'
+			errorText: 'Вы не можете выбрать период больше 12 часов',
 		}
 	},
 	watch: {
@@ -175,6 +179,10 @@ export default {
 		changeSelectedDate(formattedDate) {
 			this.selected.date.start = new Date(formattedDate.start);
 			this.selected.date.end = new Date(formattedDate.end);
+
+			if (!formattedDate.start) {
+				console.log('ues');
+			}
 		}
 	}
 }
@@ -305,21 +313,21 @@ export default {
 }
 
 .textfield__control::-moz-placeholder {
-	font-weight: 600;
+	font-weight: 400;
 	font-size: 14px;
 
 	color: #A3B3C6;
 }
 
 .textfield__control:-moz-placeholder {
-	font-weight: 600;
+	font-weight: 400;
 	font-size: 14px;
 
 	color: #A3B3C6;
 }
 
 .textfield__control:-ms-input-placeholder {
-	font-weight: 600;
+	font-weight: 400;
 	font-size: 14px;
 
 	color: #A3B3C6;
